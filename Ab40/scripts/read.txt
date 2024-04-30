@@ -1,1 +1,4 @@
 Jupyter notebooks with examples for reweighting, analysing and plotting ensemble comparisons for three forcefields
+STEP 1: Run the reweight.ipynb notebook for any forcefield - perform reweighting, generate weights, plot experimental vs MD simulation fit
+STEP 2: Run the analysis.ipynb notebook for any forcefield - plot relevant analysis of the reweighting proecedure
+STEP 3: Run the ensemble.ipynb notebook for any forcefield - calculate and plot relevant ensemble properties (Rg, secondary strctures, residue contacts etc)
