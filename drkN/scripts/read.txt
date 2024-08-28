@@ -1,4 +1,0 @@
-All jupyter notebooks for reweighting, analysis and plotting ensemble comparisons for the three forcefields.
-First run the reweight.ipynb notebook - do the reweighting procedure and generate weights + make fitting plots
-Then the analysis.ipynb notebook - make the relevant analysis plots
-Then the ensemble.ipynb notebook - make the relevant ensemble analysis - secondary structures, contacts, Rg, alpha-helical order parameter
