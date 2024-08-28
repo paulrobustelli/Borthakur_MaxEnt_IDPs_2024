@@ -7,8 +7,9 @@
   - The script requires SPARTA+ and PALES installed in your environment
   
 3. Run the Pepsi-SAXS calculation script as follows:
-  - .... have been running a new script that takes a directory of pdbs as an argument
-  - .... gonna rewrite it such that the script takes a trajectory file as an argument to bypass the issue of having too many files in the directory
+./calc_saxs.py <pdb_dir> <exp_file> <work_dir> --nproc --nchunk
+(the script requires the user to have the Pepsi-SAXS executable in the working directory. The script uses multiprocessing, and you can customize the number of processors and chunk size
+you want to use, with --nproc for number of processors and --nchunk for chunksize on each processor.
 
 4. After all the calculations are done have the directory set up as follows: https://drive.google.com/drive/u/1/folders/1iprxIvmoLrzxVldmxJfs24WU8o9fptaw. 
 The drive link has all the experimental and ensemble computed data for the a99SBdisp, c22star and Charmm36m trajectories for PaaA2, ACTR, drkN, alpha-synuclein and Ab40 proteins.
