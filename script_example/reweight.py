@@ -77,6 +77,105 @@ def block_error(x: np.ndarray):
     return np.asarray([blocks[i].std_err[j] for j, i in enumerate(optimal_indices.astype(int))])
 
 
+import numpy as np
+from scipy.optimize import minimize
+from pyblock.blocking import reblock, find_optimal_block
+import warnings
+from collections import Counter
+from numpy_indexed import group_by as group_by_
+import time
+import pickle
+import os
+from argparse import ArgumentParser
+import multiprocessing
+from itertools import chain
+import ray
+# utility functions
+
+def group_by(keys: np.ndarray,
+             values: np.ndarray = None,
+             reduction: callable = None):
+    if reduction is not None:
+        values = np.ones_like(keys) / len(keys) if values is None else values
+
+        if values.squeeze().ndim > 1:
+
+            return np.stack([i[-1] for i in group_by_(keys=keys, values=values, reduction=reduction)])
+
+        else:
+            return np.asarray(group_by_(keys=keys, values=values, reduction=reduction))[:, -1]
+
+    values = np.arange(len(keys)) if values is None else values
+
+    return group_by_(keys).split_array_as_list(values)
+
+
+def save_dict(file, dict):
+    with open(file, "wb") as handle:
+        pickle.dump(dict, handle)
+    return None
+
+
+def reindex_list(unsorted_list: list, indices: "list or np.ndarray"):
+    return list(map(unsorted_list.__getitem__, to_numpy(indices).astype(int)))
+
+
+def to_numpy(x: "int, list or array"):
+    if isinstance(x, np.ndarray):
+        return x
+    if isinstance(x, (int, float, np.int64, np.int32, np.float32, np.float64)):
+        return np.array([x])
+    if isinstance(x, list):
+        return np.asarray(x)
+    if isinstance(x, (map, filter, tuple)):
+        return np.asarray(list(x))
+
+
+def process_ids(ids):
+    types = np.array(["_".join(i.split("_")[:-1]) for i in ids])
+    indices_list = group_by(types)
+    indices = reindex_list(indices_list, np.argsort(np.fromiter(map(np.mean, indices_list), int)))
+    return indices
+
+
+def rmse(x, y):
+    return np.sqrt(np.power(x.flatten() - y.flatten(), 2).mean())
+
+
+def block_error(x: np.ndarray):
+    """
+    x : (d, N) numpy array with d features and N measurements
+    """
+    n = x.shape[-1]
+    blocks = reblock(x)
+    optimal_indices = np.asarray(find_optimal_block(n, blocks))
+    isnan = np.isnan(optimal_indices)
+    mode = Counter(optimal_indices[~isnan].astype(int)).most_common()[0][0]
+    optimal_indices[isnan] = mode
+    return np.asarray([blocks[i].std_err[j] for j, i in enumerate(optimal_indices.astype(int))])
+
+
+
+def conditional_ray(attr):
+    """conditional ray decorator
+    """
+
+    def decorator(func):
+
+        def inner(*args, **kwargs):
+
+            is_ray = getattr(args[0], attr)
+
+            if is_ray:
+                return ray.remote(func)
+            else:
+                return func
+
+        return inner
+
+    return decorator
+
+
 class MaxEntropyReweight():
     def __init__(self,
                  constraints: list,
@@ -121,6 +220,8 @@ class MaxEntropyReweight():
 
         # regularization hyperparameter (one per data type)
         self.sigma_reg = np.zeros(self.n_constraints) if sigma_reg is None else np.copy(sigma_reg)
+
+        self.is_ray = False
 
     def compute_weights(self, lambdas, constraints: np.ndarray = None):
         constraints = self.constraints if constraints is None else constraints
@@ -238,15 +339,16 @@ class MaxEntropyReweight():
             assert self.weights is not None, "Must provide weights if class attribute 'weights' is None"
             weights = self.weights
         return 100 / (self.n_samples * np.power(weights, 2).sum())
-
-    def kish_scan(self,
-                  data_indices: list = None,
-                  target_kish: float = None,
-                  sigma_reg_l: float = 0.001,
-                  sigma_reg_u: float = 20,
-                  steps: int = 200,
-                  scale: np.array = 1,
-                  store_sigma: bool = False):
+    
+    @conditional_ray("is_ray")
+    def kish_scan_(self,
+                   data_indices: list = None,
+                   target_kish: float = None,
+                   sigma_reg_l: float = 0.001,
+                   sigma_reg_u: float = 20,
+                   steps: int = 200,
+                   scale: np.array = 1,
+                   store_sigma: bool = False):
 
         if data_indices is not None:
 
@@ -278,6 +380,34 @@ class MaxEntropyReweight():
         if store_sigma: self.sigma_reg[data_indices] = sigma_optimal
 
         return sigma_optimal
+    
+    def kish_scan(self,
+                  data_indices: list = None,
+                  target_kish: float = None,
+                  sigma_reg_l: float = 0.001,
+                  sigma_reg_u: float = 20,
+                  steps: int = 200,
+                  scale: np.array = 1,
+                  store_sigma: bool = False):
+        
+        
+        
+        args = dict(self=self,
+                    data_indices=data_indices,
+                    target_kish=target_kish,
+                    sigma_reg_l=sigma_reg_l,
+                    sigma_reg_u=sigma_reg_u,
+                    steps=steps,
+                    scale=scale,
+                    store_sigma=store_sigma
+                   )
+        
+        
+        if self.is_ray:
+            return self.kish_scan_().remote(**args)
+        else:
+            return self.kish_scan_()(**args)
+    
 
     def optimize_sigma_reg(self,
                            indices_list: list,
@@ -287,20 +417,41 @@ class MaxEntropyReweight():
                            global_sigma_reg_l: float = 0.01,
                            global_sigma_reg_u: float = 20,
                            global_steps: int = 60,
+                           multi_proc : bool = False
                            ):
 
-        single_regs = np.concatenate([self.kish_scan(i,
-                                                     sigma_reg_l=single_sigma_reg_l,
-                                                     sigma_reg_u=single_sigma_reg_u,
-                                                     steps=single_steps) * np.ones(len(i))
-                                      for i in indices_list])
 
+        if multi_proc:
+            
+            self.is_ray = True
+           
+            single_regs = np.asarray(ray.get([self.kish_scan(i,
+                                                  sigma_reg_l=single_sigma_reg_l,
+                                                  sigma_reg_u=single_sigma_reg_u,
+                                                  steps=single_steps)
+                                      for i in indices_list])).astype(float)
+            
+            single_regs = np.concatenate([np.ones(len(i)) * j for i, j in zip(indices_list, single_regs)])
+            
+            self.is_ray = False
+            
+                                
+        else:
+            single_regs = np.concatenate([self.kish_scan(i,
+                                                       sigma_reg_l=single_sigma_reg_l,
+                                                       sigma_reg_u=single_sigma_reg_u,
+                                                       steps=single_steps) * np.ones(len(i))
+                                      for i in indices_list])
+            
         self.kish_scan(scale=single_regs,
                        store_sigma=True,
                        sigma_reg_l=global_sigma_reg_l,
                        sigma_reg_u=global_sigma_reg_u,
                        steps=global_steps,
                        )
+        return
+
+
 
 
 if __name__ == "__main__":
