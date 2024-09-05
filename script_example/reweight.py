@@ -10,6 +10,9 @@ import time
 import pickle
 import os
 from argparse import ArgumentParser
+import multiprocessing
+from itertools import chain
+import ray
 
 
 # utility functions
@@ -77,19 +80,7 @@ def block_error(x: np.ndarray):
     return np.asarray([blocks[i].std_err[j] for j, i in enumerate(optimal_indices.astype(int))])
 
 
-import numpy as np
-from scipy.optimize import minimize
-from pyblock.blocking import reblock, find_optimal_block
-import warnings
-from collections import Counter
-from numpy_indexed import group_by as group_by_
-import time
-import pickle
-import os
-from argparse import ArgumentParser
-import multiprocessing
-from itertools import chain
-import ray
+
 # utility functions
 
 def group_by(keys: np.ndarray,
