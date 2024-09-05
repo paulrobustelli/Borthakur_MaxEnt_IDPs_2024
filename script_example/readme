@@ -1,1 +1,6 @@
-https://drive.google.com/drive/folders/1zNemBUCe5EiJ-ktGWn1pRy3Isl6WSEuT?usp=sharing
+download reweight.py 
+in terminal run ./reweight.py --help 
+get the necessary input data from: https://drive.google.com/drive/folders/1zNemBUCe5EiJ-ktGWn1pRy3Isl6WSEuT?usp=sharing
+currently the script runs the full regularization/KishScan optimization and saves a dictionary with optimal reweighting result
+the drkN_a99SBdisp_reweight.ipynb has the exp vs calc plots and the kish/rmse results of global reweighting for you to compare the results
+the reweight_script_example.ipynb has the example using the script reweight.py for comparison
