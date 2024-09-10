@@ -345,7 +345,7 @@ class MaxEntropyReweight():
                            multi_proc : bool = False
                            ):
 
-
+        # regularization for each data type
         if multi_proc:
             
             self.is_ray = True
@@ -367,7 +367,8 @@ class MaxEntropyReweight():
                                                        sigma_reg_u=single_sigma_reg_u,
                                                        steps=single_steps) * np.ones(len(i))
                                       for i in indices_list])
-            
+
+        # global regularization - find single scalar for regularization parameters of each data type
         self.kish_scan(scale=single_regs,
                        store_sigma=True,
                        sigma_reg_l=global_sigma_reg_l,
