@@ -444,4 +444,4 @@ if __name__ == "__main__":
 
     file = f"reweighting_result_dict_{args.description}" if args.description is not None else "reweighting_result_dict"
 
-    save_dict(f"{path}/{file}", result)
+    save_dict(f"{path}/{file}.pkl", result)
