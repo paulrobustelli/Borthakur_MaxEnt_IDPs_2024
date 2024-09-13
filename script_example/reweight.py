@@ -30,9 +30,10 @@ def group_by(keys: np.ndarray,
         else:
             return np.asarray(group_by_(keys=keys, values=values, reduction=reduction))[:, -1]
 
-    values = np.arange(len(keys)) if values is None else values
+    else:
+        values = np.arange(len(keys)) if values is None else values
 
-    return group_by_(keys).split_array_as_list(values)
+        return group_by_(keys).split_array_as_list(values)
 
 
 def save_dict(file, dict):
