@@ -50,6 +50,7 @@ class DensityComparator():
 
     def __init__(self, data: list, weights: list = None):
 
+        self.bounds = None
         self.data_list = data
         self.weights_list = weights
 
@@ -67,7 +68,7 @@ class DensityComparator():
 
         x = [i.squeeze() for i in x]
 
-        assert len(set([i.shape for i in x])) == 1, "All data arrays must be the same dimension"
+        assert len(set([i.shape[-1] for i in x])) == 1, "All data arrays must be the same dimension"
 
         # print(x[0].ndim)
 
@@ -83,9 +84,6 @@ class DensityComparator():
 
         return
 
-    @property
-    def data_array(self):
-        return np.stack(self.data_list)
 
     @property
     def weights_list(self):
@@ -110,34 +108,30 @@ class DensityComparator():
 
         return
 
-    @property
-    def weights_array(self):
-
-        assert self.weights_list_ is not None, "Must have weights list to construct array"
-
-        return np.stack(self.weights_list)
 
     def set_bounds(self):
 
         assert self.data_list is not None, "Must have data_list_ attribute in order to estimate bounds"
 
-        data_array = self.data_array
-
-        self.bounds = np.array([get_extrema(i) for i in self.data_array.T])
+        self.bounds = np.array([get_extrema(i) for i in np.concatenate(self.data_list).T])
 
         return
 
-    def estimate_kde(self, bins: int = 80, norm: bool = True, weight: bool = False):
+    def estimate_kde(self,
+                     bins: int = 80,
+                     norm: bool = True,
+                     weight: bool = False,
+                     bw_method=None):
 
         self.bins = bins
 
         if weight:
             assert self.weights_list is not None, "Must have weights list in order to estimate weighted KDE"
 
-            kdes = [gaussian_kde(i.T, weights=j) for i, j in zip(self.data_list, self.weights_list)]
+            kdes = [gaussian_kde(i.T, weights=j, bw_method=bw_method) for i, j in zip(self.data_list, self.weights_list)]
 
         else:
-            kdes = [gaussian_kde(i.T) for i in self.data_list]
+            kdes = [gaussian_kde(i.T, bw_method=bw_method) for i in self.data_list]
 
         self.kde_grid = product(*[np.linspace(i[0], i[1], bins) for i in self.bounds])
 
@@ -298,15 +292,15 @@ class DensityComparator():
         args = dict(figsize=(6, 1.8), title_pad=1.11, sharex=True, sharey=True)
         args.update(kwargs)
 
-        subplots_fes2d(x=self.data_array,
+        subplots_fes2d(x=self.data_list,
                        cols=self.n_datasets,
                        title=f"Reweighted : {title}" if weight else title,
                        dscrs=dscrs,
                        weights_list=self.weights_list if weight else None,
                        rows=1,
+                       extent=self.bounds,
                        **args)
         return
-
 
 
 
