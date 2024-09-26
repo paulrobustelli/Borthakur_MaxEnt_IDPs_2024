@@ -30,7 +30,7 @@ you want to use, with --nproc for number of processors and --nchunk for chunksiz
 4. After all the calculations are done have the directory set up as follows: https://drive.google.com/drive/folders/1wROMvOgKjLkhjBD4FRiT0OdWTZyDupgM?usp=sharing. 
 The drive link has all the experimental and ensemble computed data for the a99SBdisp, c22star and Charmm36m trajectories for PaaA2, ACTR, drkN, alpha-synuclein and Ab40 proteins.
 
-5. For any protein system run the <proteinname>_<forcefieldname>_reweight.ipynb notebook. This notebook does the actual reweighting. After all the rounds of reweighting
+5. For any protein system run the {protein}_{forcefieldname}_reweight.ipynb notebook. This notebook does the actual reweighting. After all the rounds of reweighting
 have been completed, the notebook automatically saves all the relevant information and weights in their own separate directories.
 
 6. After the reweighting notebook, for the same protein system run the <protein>_<forcefield>_analysis.ipynb notebook
