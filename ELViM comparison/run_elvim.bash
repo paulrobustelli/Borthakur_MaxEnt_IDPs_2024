@@ -15,4 +15,4 @@ concatenated_traj = ""$dscr"_cat.dcd" # this will be generated from cat_trajs.np
 
 elvim_output_file = ""$dscr"_elvim_cat.txt"
 
-python3 elvim.py -f "$dcd" -t "$pdb" -o "$elvim_output_file"
+python3 elvim.py -f "$concatenated_traj" -t "$pdb" -o "$elvim_output_file"
