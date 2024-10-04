@@ -1,7 +1,9 @@
 
 # Towards accurate, force field independent conformational ensembles of intrinsically disordered proteins
 
-This is the github repository that includes all the notebooks and scripts to reweight MD simulations of intrinsically disordered proteins using a multiple experimental data-types. The notebooks are all arranged in their own separate directories. The scripts to calculate the predicted data from forward models such as Pepsi-SAXS, SPARTA+ and PALES are also included herein. 
+This is the github repository for the manuscript "Towards accurate, force field independent conformational ensembles of intrinsically disordered proteins" by Kaushik Borthakur, Thomas R. Sisk, Francesco P. Panei , Massimiliano Bonomi, and Paul Robustelli.
+
+This repository includes notebooks and scripts to calculate experimental data from MD trajectories and perform maximum entropy reweighting of MD ensembles using experimental data as restraints. 
 
 
 ## PUBLICATION
