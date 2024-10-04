@@ -47,7 +47,7 @@ inter-residue contact maps, Radius of gyration distributions etc.
 
  ## CONTACT INFORMATION
  If you have any queries about the paper and/or the code please reach out to:
-kaushik.borthakur.gr@dartmouth.edu
+kaushik.borthakur.gr@dartmouth.edu,
 paul.j.robustelli@dartmouth.edu
 
 
