@@ -1,5 +1,5 @@
 
-# Refining long timescale molecular dynamics simulations of intrinsically disordered proteins with experimental data
+# Towards accurate, force field independent conformational ensembles of intrinsically disordered proteins
 
 This is the github repository that includes all the notebooks and scripts to reweight MD simulations of intrinsically disordered proteins using a multiple experimental data-types. The notebooks are all arranged in their own separate directories. The scripts to calculate the predicted data from forward models such as Pepsi-SAXS, SPARTA+ and PALES are also included herein. 
 
