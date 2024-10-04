@@ -29,8 +29,7 @@ you want to use, with --nproc for number of processors and --nchunk for chunksiz
 
 * If Pepsi-SAXS is not automatically installed when activating the environment, it can be downloaded from https://team.inria.fr/nano-d/software/pepsi-saxs/
 
-4. After all the calculations are done have the directory set up as follows: https://drive.google.com/drive/folders/1wROMvOgKjLkhjBD4FRiT0OdWTZyDupgM?usp=sharing. 
-The drive link has all the experimental and ensemble computed data for the a99SBdisp, c22star and Charmm36m trajectories for PaaA2, ACTR, drkN, alpha-synuclein and Ab40 proteins.
+4. Ensemble computed data for the a99SBdisp, c22star and Charmm36m trajectories for PaaA2, ACTR, drkN, alpha-synuclein and Ab40 proteins will be uploaded shortly
 
 5. For any protein system run the {protein}_{forcefieldname}_reweight.ipynb notebook. This notebook does the actual reweighting. After all the rounds of reweighting
 have been completed, the notebook automatically saves all the relevant information and weights in their own separate directories.
