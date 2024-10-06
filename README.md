@@ -3,13 +3,15 @@
 
 This is the github repository for the manuscript "Towards accurate, force field independent conformational ensembles of intrinsically disordered proteins" by Kaushik Borthakur, Thomas R. Sisk, Francesco P. Panei , Massimiliano Bonomi, and Paul Robustelli.
 
+https://doi.org/10.1101/2024.10.04.616700
+
 This repository includes notebooks and scripts to calculate experimental data from MD trajectories and perform maximum entropy reweighting of MD ensembles using experimental data as restraints. 
 
 
 ## PUBLICATION
 
-To learn more about our Maximum Entropy Reweighting Method please check out our paper/preprint:
-
+To learn more about our Maximum Entropy Reweighting Method please check out our preprint:
+https://doi.org/10.1101/2024.10.04.616700
 
 ## DOCUMENTATION
 
