@@ -1,7 +1,7 @@
 
-# Towards accurate, force field independent conformational ensembles of intrinsically disordered proteins
+# Determining accurate conformational ensembles of intrinsically disordered proteins at atomic resolution
 
-This is the github repository for the manuscript "Towards accurate, force field independent conformational ensembles of intrinsically disordered proteins" by Kaushik Borthakur, Thomas R. Sisk, Francesco P. Panei , Massimiliano Bonomi, and Paul Robustelli.
+This is the github repository for the manuscript "Determining accurate conformational ensembles of intrinsically disordered proteins at atomic resolution" by Kaushik Borthakur, Thomas R. Sisk, Francesco P. Panei , Massimiliano Bonomi, and Paul Robustelli.
 
 https://doi.org/10.1101/2024.10.04.616700
 
