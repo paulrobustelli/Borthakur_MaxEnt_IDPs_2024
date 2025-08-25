@@ -314,7 +314,8 @@ class MaxEntropyReweight():
                   sigma_reg_u: float = 20,
                   steps: int = 200,
                   scale: np.array = 1,
-                  store_sigma: bool = False):
+                  store_sigma: bool = False,
+                  multi_proc: bool = False):
         
         
         
@@ -329,8 +330,11 @@ class MaxEntropyReweight():
                    )
         
         
-        if self.is_ray:
-            return self.kish_scan_().remote(**args)
+        if multi_proc:
+          self.is_ray = True
+          return_ =  self.kish_scan_().remote(**args)
+          self.is_ray = False
+          return return_
         else:
             return self.kish_scan_()(**args)
     
@@ -347,27 +351,13 @@ class MaxEntropyReweight():
                            ):
 
         # regularization for each data type
-        if multi_proc:
-            
-            self.is_ray = True
-           
-            single_regs = np.asarray(ray.get([self.kish_scan(i,
-                                                  sigma_reg_l=single_sigma_reg_l,
-                                                  sigma_reg_u=single_sigma_reg_u,
-                                                  steps=single_steps)
-                                      for i in indices_list])).astype(float)
-            
-            single_regs = np.concatenate([np.ones(len(i)) * j for i, j in zip(indices_list, single_regs)])
-            
-            self.is_ray = False
-            
-                                
-        else:
-            single_regs = np.concatenate([self.kish_scan(i,
-                                                       sigma_reg_l=single_sigma_reg_l,
-                                                       sigma_reg_u=single_sigma_reg_u,
-                                                       steps=single_steps) * np.ones(len(i))
-                                      for i in indices_list])
+ 
+        single_regs = np.concatenate([self.kish_scan(i,
+                                                   sigma_reg_l=single_sigma_reg_l,
+                                                   sigma_reg_u=single_sigma_reg_u,
+                                                   steps=single_steps,
+                                                   multi_proc=multi_proc) * np.ones(len(i))
+                                  for i in indices_list])
 
         # global regularization - find single scalar for regularization parameters of each data type
         self.kish_scan(scale=single_regs,
